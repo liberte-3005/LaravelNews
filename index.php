@@ -2,6 +2,7 @@
 
 
 
+//1.リロードによる重複　2.記事を一行だけ表示にしたい　3.ページ遷移
 
 
 //var_dump($_); 
@@ -13,7 +14,7 @@ $id = uniqid(); //IDの自動生成
 $now_date = date("Y-m-d H:i:s");
 $DATA = []; //一回分の投稿情報
 $BOARD = []; //全ての投稿情報
-$error_message = array();
+$error_message = [];
 
 
 //ファイル
@@ -38,7 +39,9 @@ if ($_SERVER ['REQUEST_METHOD'] === 'POST' ){
         $BOARD[] = $DATA;
 
         //ファイルに保存する(FILEにBOARDの内容を上書きする)関数、決まりごと
-        file_put_contents($FILE, json_encode($BOARD, JSON_UNESCAPED_UNICODE)); //ユニコードされた文字をそのままの形式で表示する
+        file_put_contents($FILE, json_encode($BOARD, JSON_UNESCAPED_UNICODE));
+        header('Location:'.$_SERVER['SCRIPT_NAME']); 
+        exit;
     }else{
         //titleとtxtが空だったときにエラーメッセージを表示する
         if(empty($_POST['title']))$error_message[] = 'タイトルは必須です。';
@@ -54,7 +57,6 @@ if(strlen($_POST['title']) > 30){
 ?>
 
 <!DOCTYPE html>
-<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>Laravel News</title>
@@ -64,10 +66,10 @@ if(strlen($_POST['title']) > 30){
     
 
     <nav class="navHead">
-        <a class="linkItalik" href="">Laravel News</a>
+        <a class="mainTitle" href="/">Laravel News</a>
     </nav>
 
-    <section>
+<section>
     <h2>さぁ、最新のニュースをシェアしましょう</h2>
 
     <!--ErrorMessageStart-->
@@ -94,21 +96,21 @@ if(strlen($_POST['title']) > 30){
                 <input type="submit" value="投稿" class="submitStyle">
             </div>
      </form>
-    </section>
+
 <!--PostEnd-->
 <hr>
 <!--ContentStart-->
     <div class="postsContainer">
         <?php foreach (array_reverse ($BOARD) as $ARTICLE) : ?>
             <div class="post">
-                <p><?php echo $ARTICLE[1]; ?></p>
-                <p><?php echo $ARTICLE[2]; ?></p>
-                <a class="postPage" href="http://localhost/posts.php?id=<?php echo $ARTICLE[0] ?>">記事全文・コメントを見る　</a>
+                <p class="articleTitle"><?php echo $ARTICLE[1]; ?></p>
+                <p class="articleText"><?php echo $ARTICLE[2]; ?></p>
+                <a class="postPage" href="http://localhost/text.php?id=<?php echo $ARTICLE[0] ?>">コメントを見る　</a>
             </div> <hr>
         <?php endforeach; ?>
     </div>
 <!--ContentStartEnd-->
-
+</section>
 <script src="index.js"></script>
 
 </body>
